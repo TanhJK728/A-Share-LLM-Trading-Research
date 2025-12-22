@@ -25,3 +25,6 @@ graph TD
         ClickHouse -->|提供价格| Strategy(均线回测 / NLP热点)
         MongoDB -->|提供舆情| Strategy
     end
+
+
+每天在终端输入: sh daily_work.sh
