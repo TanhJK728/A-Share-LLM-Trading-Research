@@ -28,3 +28,13 @@ graph TD
 
 
 每天在终端输入: sh daily_work.sh
+
+
+
+全自动的系统：
+
+收盘后：跑 strategy_technical.py 算分。
+
+交易时：跑 mock_trader_full.py。
+
+不断的优胜劣汰，让资金永远流向概率最高的地方。
