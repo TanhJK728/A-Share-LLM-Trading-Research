@@ -15,7 +15,7 @@ We construct a multi-dimensional feature vector $X_t$ for each stock on day $t$.
 **A. Quantitative Factor Model (Price/Volume Alpha via LightGBM)**  
 Trained on Qlib’s factor set (Alpha158-style), optimized for A-Share microstructure noise.
 - **Target (5D ref return):**
-  $`Y^{\text{train}}_t = \frac{\mathrm{Ref}(\texttt{\$close},-5)}{\texttt{\$close}} - 1`$
+  $`Y^{\text{train}}_t = \frac{\mathrm{Ref}(\texttt{$close$},-5)}{\texttt{$close$}} - 1`$
 
 - **Example hyperparameters:** learning rate $`=0.0421`$, $`num\_leaves = 210`$.
 
@@ -31,7 +31,7 @@ RAG-like scoring for incremental news:
 - **Scoring:**
   $`S=\text{Direction}\times \tanh(\text{Magnitude}\times \text{Certainty})`$
 
-**Notation:** $`O,H,L,C,V`$ are open, high, low, close, and volume. $`\mathrm{Rank}(\cdot)`$ is cross-sectional rank. $`\mathrm{Ref}(x,-k)`$ shifts $`x`$ forward by $`k`$ days.
+**Notation:** $`\mathrm{Rank}(\cdot)`$ is cross-sectional rank. $`\mathrm{Ref}(x,-k)`$ shifts $`x`$ forward by $`k`$ days.
 
 ### 1.2 Modeling & Labeling
 
