@@ -4,56 +4,47 @@
 
 # A-Share NLP & Event Research
 
-**When does financial language add predictive information beyond market state and information coverage?**
+**We built an NLP framework that measures what Chinese financial text adds to return forecasts based on market data.** It combines character-bigram text models, controlled feature comparisons, and returns measured after disclosure.
 
-This project studies Chinese financial text through character-level representations, controlled prediction experiments, and time-aware event alignment. The research progresses from broad headline-content tests to a sharper question: how do fundamental news, surprise, and the market's prior response interact?
+The research connects three parts of a financial text signal: its content, its arrival time, and the market response that follows. By defining each part explicitly, we can test whether richer language representations improve predictions beyond prices, volume, and document metadata.
 
-The current evidence combines a single-stock headline pilot with a five-stock disclosure-event study. The headline pilot exposes the importance of information-count controls; the event study shows how overlapping return windows can change a conclusion. Together, they motivate richer, evidence-linked semantic modeling.
+## Research contributions
+
+- **Measure the value of text content.** We compare text features with market data and document-count controls on the same observations. This shows how the choice of control changes the apparent contribution of NLP.
+- **Define prediction in event time.** We connect disclosure timing to benchmark-adjusted returns over 5, 20, and 60 trading sessions. Each target has an explicit entry price, exit price, and information cutoff.
+- **Test how return overlap affects ranking.** We evaluate the same fitted model on all observed events and on a subset with non-overlapping holding periods. This reveals how much the reported association depends on the evaluation sample.
+
+The completed studies cover headline content and official financial disclosures. A prepared semantic extraction interface extends this framework to fundamental news, surprise, and the market's prior price response.
 
 <p align="center">
-  <a href="#research-design">Research design</a> ·
-  <a href="#mathematical-methods">Mathematical methods</a> ·
-  <a href="#empirical-findings">Empirical findings</a> ·
+  <a href="#nlp-and-mathematical-formulation">NLP & mathematics</a> ·
+  <a href="#what-the-experiments-show">Experimental findings</a> ·
   <a href="#next-surprise--market-state">Surprise × market state</a> ·
   <a href="#reproduce-the-figures">Reproduce</a>
 </p>
 
-| Research snapshot | Scope |
-| :--- | :--- |
-| **Latest experiment** | Stage 2.4 · frozen October 4, 2026 |
-| **Temporal design** | Train: 2018–2025 · development validation: 2026, before October 4 |
-| **Event evidence** | 306 unique events across 5 stocks · 25 validation events |
-| **Completed comparison** | 7 non-LLM baselines × 3 horizons: 5, 20, and 60 sessions |
-| **Semantic extension** | Evidence-linked, 15-field LLM schema prepared · inference pending |
+![Research pipeline: disclosure timing, text and market features, matched models, and return evaluation. The dashed branch shows the prepared semantic extension.](assets/research-pipeline.svg)
 
-## Research design
+## NLP and mathematical formulation
 
-Stage 1 asks whether headline content improves daily prediction after controlling for the presence and number of titles. Stage 2.4 studies official financial disclosures as stock-specific events, with matched model comparisons and explicitly aligned entry and exit times.
+### 1. Represent Chinese text with character bigrams
 
-![Research pipeline: provenance and timing, text and state representations, matched models, and multi-horizon evaluation. A dashed branch identifies the prepared LLM extension.](assets/research-pipeline.svg)
+We encode text as adjacent character pairs. This provides a direct lexical baseline without a word-segmentation dictionary. The vocabulary contains at most 512 bigrams, selected from training documents.
 
-- **Control the information set.** Compare price/volume features, event metadata, and text on the same cohort. Stage 1 explicitly controls headline counts and presence; Stage 2.4 includes event metadata controls.
-- **Fit representations on the past.** Vocabulary, IDF, numerical preprocessing, and score thresholds are learned from training data. Labels crossing the training boundary are excluded from fitting.
-- **Inspect dependence.** Report every registered horizon, observed-outcome counts, and a same-stock non-overlap sensitivity alongside pooled event metrics.
-
-Document hashes, version fields, source dates, and timing assumptions accompany the local artifacts. Date-only disclosures use conservative availability bounds. Historical first availability and original-body vintage remain assumptions requiring further source verification.
-
-## Mathematical methods
-
-### 1. Character-level text representation
-
-Chinese text is represented with character bigrams, a fixed vocabulary of at most 512 features, sublinear term frequencies, and smoothed IDF. For a bigram with count $c_{dj}>0$ in document group $d$:
+For a bigram with count $c_{dj}>0$ in document group $d$, we apply sublinear term frequency and smoothed inverse document frequency:
 
 ```math
 u_{dj}=(1+\log c_{dj})\left(1+\log\frac{1+N_{\mathrm{train}}}{1+\mathrm{df}_{j,\mathrm{train}}}\right),
 \qquad x_d=\frac{u_d}{\lVert u_d\rVert_2}.
 ```
 
-Absent bigrams receive zero weight; an empty group remains a zero vector. This provides an interpretable lexical baseline for testing future semantic representations.
+Here $N_{\mathrm{train}}$ counts training document groups, and $\mathrm{df}_{j,\mathrm{train}}$ counts those containing bigram $j$. Absent bigrams receive zero weight. An empty group remains a zero vector.
 
-### 2. Matched feature ablations
+We fit the vocabulary and IDF on training data, then reuse them in validation. This keeps the text representation tied to the information available during training.
 
-Let $\phi_e$ contain a registered combination of market-state features $m_e$, event metadata $z_e$, and text features $x_e$. Each combination uses the same fixed ridge objective:
+### 2. Measure the increment from language
+
+Let $m_e$ describe market conditions, $z_e$ describe the document, and $x_e$ encode its text. We fit registered combinations of these features with the same ridge objective:
 
 ```math
 (\hat b,\hat\beta)=\underset{b,\beta}{\arg\min}\;
@@ -61,11 +52,23 @@ Let $\phi_e$ contain a registered combination of market-state features $m_e$, ev
 +10\lVert\beta\rVert_2^2.
 ```
 
-The intercept is unpenalized. The full control combines $[m_e,z_e,x_e]$; comparison models remove feature families without tuning on the 2026 rankings.
+The full model uses $\phi_e=[m_e,z_e,x_e]$. Removing feature groups creates matched comparisons. The fixed penalty keeps the fitting rule constant, and the intercept remains unpenalized.
 
-### 3. Event-aligned targets
+For a control model $C$, the reduction in validation mean squared error (MSE) measures the gain from adding text:
 
-For Stage 2.4, entry is the first eligible session open after the assumed information-availability bound plus a five-minute processing allowance. The $H$-session label includes the entry session:
+```math
+\Delta_{\mathrm{text}}(H)
+=100\left(1-\frac{\mathrm{MSE}_{C+\mathrm{text},H}}
+{\mathrm{MSE}_{C,H}}\right).
+```
+
+A positive value means that text reduces prediction error. In the headline study, $C$ includes price, volume, title count, and title presence. In the disclosure study, document metadata includes event type, source, document length, and event count.
+
+**Research value:** the comparison measures what text adds after accounting for observable information arrival and market conditions.
+
+### 3. Align the target with the disclosure
+
+For Stage 2.4, we measure returns from the first eligible session open after the assumed disclosure-availability bound plus five minutes. An $H$-session target includes the entry session:
 
 ```math
 y_{e,H}=
@@ -74,25 +77,44 @@ y_{e,H}=
 \qquad H\in\{5,20,60\}.
 ```
 
-Here $s$ is the event stock and $B$ is CSI 300. Prediction quality is summarized by **pooled stock-event Spearman Rank IC**, with a second evaluation after greedily removing overlapping holding windows for each stock. The five-stock CSI 300 branch is provisional while historical industry benchmarks are completed.
+Here $s$ denotes the stock, $B$ denotes CSI 300, and $i$ denotes the entry session. Superscripts $O$ and $C$ denote opening and closing prices. Training excludes targets whose holding periods cross into validation.
 
-## Empirical findings
+This formulation gives the text and return a common timeline. It also fixes the benchmark and holding period before comparing models.
 
-### Stage 1 · Headline content needs an information-count control
+### 4. Evaluate ranking across return windows
 
-The pilot uses **Ping An Bank**, training in **2018–2019** and development validation in **2020**. It compares four horizons and three additional processing delays, keeping the 2021 reserve untouched.
+We measure ranking quality with Spearman correlation across stock-events that have observed returns:
 
-At the primary five-session horizon with no extra delay, adding text reduces MSE by **1.753%** relative to price/volume alone. Against the stronger price/volume-plus-title-count control, MSE **increases by 0.713%**. Information arrival is therefore a necessary control when attributing predictive value to language in this pilot.
+```math
+\mathrm{RankIC}_H=
+\operatorname{Corr}_{e\in\mathcal V_H}
+\left(\operatorname{rank}(\hat y_{e,H}),
+\operatorname{rank}(y_{e,H})\right).
+```
 
-![Stage 1: all twelve horizon-by-delay comparisons of headline text against the title-count control. Positive values indicate lower validation MSE.](assets/figures/stage1-content-ablation.png)
+The comparison keeps the fitted model fixed and removes overlapping holding windows within each stock. We report both estimates with their sample counts. This makes the sensitivity to event overlap visible at each horizon.
 
-*Positive values mean lower error after adding content. The primary comparison has 461 training and 238 validation observations. This is a single-stock, single-year development experiment; the modest 20-session improvements are descriptive.*
+## What the experiments show
 
-### Stage 2.4 · Long-horizon rankings depend on overlap
+### Headline content: the control changes the interpretation
 
-The disclosure study trains on **2018–2025** and evaluates the available **2026 development window**, with market data through **September 30, 2026**. The full control combines market state, event metadata, and TF-IDF.
+The headline study uses **Ping An Bank**, with training in **2018–2019** and validation in **2020**. It covers four horizons and three additional processing delays. The 2021 reserve remains untouched.
 
-![Stage 2.4: full-control pooled and non-overlapping Rank IC at 5, 20, and 60 sessions, with observed sample sizes.](assets/figures/stage24-overlap-sensitivity.png)
+At the primary five-session horizon, the content model reduces MSE by **1.753%** relative to price and volume alone. Relative to a control that also includes title count and presence, MSE **increases by 0.713%**. Both comparisons use zero additional delay.
+
+This result establishes the role of the count control in this experiment. A comparison against market data alone would overstate the incremental value of headline content.
+
+![All twelve headline-content comparisons against the title-count control. Positive values indicate lower validation MSE.](assets/figures/stage1-content-ablation.png)
+
+*The primary comparison uses 461 training observations and 238 validation observations. Zero additional delay already waits until the next session after the source date.*
+
+### Disclosure events: overlap changes the long-horizon ranking
+
+The disclosure study uses **306 unique events across five stocks**. Training covers **2018–2025**, followed by **2026 development validation**. The October 4 snapshot includes market data through September 30, 2026.
+
+We compare seven baselines across three horizons. The model below combines market features, event metadata, and TF-IDF text.
+
+![Rank IC before and after removing overlapping holding periods, with sample counts at each horizon.](assets/figures/stage24-overlap-sensitivity.png)
 
 | Horizon | Training events | Observed validation outcomes | Pooled Rank IC | Non-overlap outcomes | Non-overlap Rank IC |
 | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -100,40 +122,42 @@ The disclosure study trains on **2018–2025** and evaluates the available **202
 | 20 sessions | 276 | 25 | −0.2578 | 18 | −0.3849 |
 | 60 sessions | 271 | 17 | +0.2454 | 7 | −0.1786 |
 
-The 60-session association changes sign after overlap removal. With only seven remaining outcomes, this finding motivates a larger event panel and stronger dependence controls. The current evidence does **not establish stable incremental alpha**. The 60-session confidence interval is unavailable under the registered minimum of 20 observed outcomes.
+At 60 sessions, Rank IC changes from **+0.2454 to −0.1786** after overlap removal. The remaining sample contains seven outcomes. This demonstrates why event overlap belongs in the evaluation of long-horizon text signals.
 
 <details>
-<summary><strong>View all seven registered baselines</strong></summary>
+<summary><strong>All seven baselines and three horizons</strong></summary>
 
 ![All registered non-LLM models and horizons. The constant historical-mean baseline has undefined Rank IC.](assets/figures/stage24-model-comparison.png)
 
-“Market state” maps to the implementation's `financial_only` model: available features chiefly describe prices, volume, and market conditions. Nine industry, valuation, and historical accounting columns are missing in this run. The constant historical-mean predictor has undefined Rank IC.
+The market feature family corresponds to `financial_only` in the code. Its available inputs chiefly describe prices, volume, and market conditions. Nine industry, valuation, and historical accounting columns are missing in this run. The constant historical-mean model has undefined Rank IC.
 
-Across the seven models and three horizons, 525 validation predictions come from **25 underlying events**. Adding TF-IDF to market state and metadata changes ranking metrics but produces the same simulated trades under the frozen entry rule. Full numerical values and model identifiers are in the [public snapshot](docs/research/snapshot.json).
+The 525 model predictions represent **25 distinct validation events**. Adding TF-IDF to market features and metadata changes the ranking metrics but produces the same trades under the fixed entry rule.
+
+[View the complete numerical results.](docs/research/snapshot.json)
 
 </details>
 
-The two stages use different cohorts, time periods, and target conventions. Their results address complementary questions and are reported separately. See the [evidence and methods note](docs/research/README.md) for the precise comparison scope.
+**Study scope.** These estimates describe predictive associations in the development samples above. The disclosure study uses CSI 300 as its benchmark. Historical industry coverage and document dates and versions need further verification. The 60-session sample falls below the 20-outcome minimum for confidence intervals. See the [methods note](docs/research/README.md) for details.
 
 ## Next: surprise × market state
 
-The next hypothesis is that predictive value concentrates in events with **new fundamental information**, **a verifiable expectation gap**, and **limited prior price response**. A prepared semantic schema separates fundamental direction, earnings quality, surprise, demand, margins, persistence, novelty, and risk, with source-linked evidence for each supported field.
+We implemented a 15-field semantic extraction interface for fundamental direction, earnings quality, surprise, demand, margins, persistence, novelty, and risk. Each supported field links to a source quotation. The input combines the current disclosure with up to three strictly earlier documents.
 
-An example registered interaction is:
+The next experiment tests whether information has greater predictive value when it changes expectations and follows a smaller prior price response. One registered interaction combines surprise $S_e$, persistence $\Pi_e$, and a measure of that response:
 
 ```math
-g_e=S_e\,\Pi_e\left[1-\widehat F_{\mathrm{train}}\!\left(r_e^{\mathrm{prior}}\right)\right],
+g_e=S_e\,\Pi_e\left[1-\widehat F_{\mathrm{train}}\!\left(r_e^{\mathrm{prior}}\right)\right].
 ```
 
-where $S_e$ is evidence-supported earnings or guidance surprise, $\Pi_e$ is persistence, and the empirical CDF turns prior relative return into a priced-in proxy. The default design uses prior industry-relative return; completing its historical benchmark is part of the next data milestone. The proxy measures prior price response, with market expectations remaining a separate object to validate.
+The empirical CDF expresses prior relative return as a percentile of training observations. Its complement assigns higher weight to smaller prior returns. The default design uses the pre-event 20-session industry-relative return.
 
-The planned **Surprise × Priced-in** grid will report sample counts and realized outcomes in every cell. It is currently unestimated: the audited numerical expectation store and historical industry coverage must be completed before semantic inference. The prepared context bundles one current document with up to three strictly earlier documents; unsupported surprise values remain `null`.
+The planned **Surprise × Priced-in** grid will compare event counts and subsequent returns across its four cells. This extension is prepared for inference. Completing historical industry data and audited guidance-to-actual comparisons precedes the first LLM experiment. Unsupported surprise values remain `null`.
 
-**Why 2026?** It is the development window for examining whether event responses differ in a more algorithmic market. A claim about quantitative crowding will require a separate participation or crowding measure. Future prospective validation will use a newly frozen protocol and later observations.
+The 2026 development window also motivates a question about quantitative crowding and event responses. Testing that mechanism will require a separate crowding measure. Later observations will support prospective validation under a newly frozen protocol.
 
 ## Reproduce the figures
 
-The public research package contains aggregate observations, source fingerprints, and a deterministic plotting script. It regenerates the figures above from the frozen snapshot:
+The script reads the published result tables and generates all three experimental figures:
 
 ```bash
 git clone https://github.com/TanhJK728/A-Share-LLM-Trading-Research.git
@@ -144,24 +168,17 @@ python -m pip install -r docs/research/requirements.txt
 python scripts/render_research_figures.py
 ```
 
-| Artifact | Purpose |
-| :--- | :--- |
-| [Research snapshot](docs/research/snapshot.json) | All plotted aggregates, model identifiers, sample sizes, and source SHA-256 fingerprints |
-| [Methods & evidence](docs/research/README.md) | Cohort definitions, timing, interpretation, and provenance |
-| [Figure generator](scripts/render_research_figures.py) | Matplotlib source for PNG and SVG outputs |
-| [Vector illustrations](assets/) | Original research overview and pipeline diagrams |
-
-The local Stage 2.4 run passed 373 offline tests, 2,289 independent prediction/threshold/metric checks, and reconciliation of 63 finite-cash portfolio scenarios. These are snapshot-level engineering checks. The public package reproduces the aggregate figures; end-to-end reruns additionally require the local research modules, source documents, and market snapshots.
+[Result tables](docs/research/snapshot.json) · [Plotting code](scripts/render_research_figures.py) · [Methods](docs/research/README.md)
 
 ## Repository context
 
-The original system provides the engineering foundation: AkShare ingestion, ClickHouse/MongoDB storage, Qlib feature export, LightGBM modeling, and experimental sentiment and execution modules.
+The original system supplies market-data collection, Qlib feature export, LightGBM modeling, and experimental sentiment and trading modules.
 
-| Existing code | Role |
+| Code | Role |
 | :--- | :--- |
-| [`data_ingestion/`](data_ingestion/) | Market, benchmark, concept, and news collection |
-| [`data_processing/`](data_processing/) | Qlib-oriented data export |
+| [`data_ingestion/`](data_ingestion/) | Collect market, benchmark, concept, and news data |
+| [`data_processing/`](data_processing/) | Export data for Qlib |
 | [`research/`](research/) | Original factor, sector, and sentiment experiments |
 | [`backtest/`](backtest/) · [`trade/`](trade/) | Original simulation and execution prototypes |
 
-The figures on this page document the newer controlled NLP studies. Earlier strategy demonstrations remain in the repository's [history](https://github.com/TanhJK728/A-Share-LLM-Trading-Research/commits/main/README.md). The next research deliverables are historical industry coverage, audited guidance-to-actual links, semantic ablations, and a prospective evaluation with a frozen information set.
+The research framework connects financial language to explicit prediction targets and controlled empirical tests. It provides a common basis for comparing lexical models, structured financial semantics, and future language-model representations.
