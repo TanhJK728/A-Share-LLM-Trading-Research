@@ -1,0 +1,560 @@
+{
+  "schema_version": "research-figures-v1",
+  "result_snapshot_date": "2026-10-04",
+  "description": "Public aggregate extract from saved research results; contains no raw disclosure bodies or private filesystem references.",
+  "provenance": {
+    "stage1_report": {
+      "original_repository_relative_path": "nlp_research/RESEARCH_PROGRESS.md",
+      "sha256": "4a43a62386c6585b807f9f7831a50dea6a4caaa62f4c6e2dca7d94be6791eac0",
+      "selection": "Published 4x3 ablation table and one 5D comparator example; rounded report values"
+    },
+    "stage24_metrics": {
+      "original_repository_relative_path": "nlp_research/stage2_4_results/run_20261004T235930Z/baseline/metrics.json",
+      "sha256": "e14ee6c928fd45a412bd0018ac08d49c82c6eaed46da3ed02124239ce6a16cdb",
+      "selection": "Core provisional CSI300 branch; all seven completed models and all three registered horizons"
+    },
+    "stage24_protocol": {
+      "original_repository_relative_path": "nlp_research/stage2_4_results/run_20261004T235930Z/frozen_protocol.json",
+      "sha256": "a5db37cefdc8e8fbd6c560ec89791d60e214a4ecd28b0507a05de74f77cbf2a6",
+      "selection": "Train/validation boundaries, frozen target universes, label convention, paid-call count"
+    },
+    "point_verification": {
+      "original_repository_relative_path": "nlp_research/stage2_4_results/run_20261004T235930Z/baseline/verification.json",
+      "sha256": "db42b5a3e0ec17444ccad881c06c3e74ef45ed90959d625e1aa4d402db1b2908",
+      "selection": "Status and checked point-metric count only"
+    },
+    "portfolio_verification": {
+      "original_repository_relative_path": "nlp_research/stage2_4_results/run_20261004T235930Z/portfolio_independent_verification.json",
+      "sha256": "75e8c5ea8e72e5aa1374aa5b0779d40873b43befdecbc03deda54e2a1021489c",
+      "selection": "Status and checked-account count only"
+    },
+    "test_verification": {
+      "original_repository_relative_path": "nlp_research/stage2_4_results/run_20261004T235930Z/test_verification.json",
+      "sha256": "8ea3ef65903a0cebba416efaea1994b8f2b72e39a393b9f32189d4f22c1353a8",
+      "selection": "Status and test count only; execution command excluded"
+    }
+  },
+  "stage1": {
+    "study_id": "pilot_development_v1",
+    "security": {
+      "ticker": "000001",
+      "name": "Ping An Bank"
+    },
+    "training_years": [
+      2018,
+      2019
+    ],
+    "validation_year": 2020,
+    "text_representation": "Training-fitted character-bigram TF-IDF; mixed-source headlines",
+    "metric": "100 * (1 - MSE_content_model / MSE_control_model)",
+    "primary_control": "Price-volume features + title count and presence",
+    "reported_decimal_places": 3,
+    "horizon_unit": "trading sessions",
+    "timing_note": "Additional delay 0 already waits until the next session after the source date; Stage 1 uses open-to-open labels.",
+    "cohort_note": "Single-stock 2020 development study, conditional on observed holding paths.",
+    "rows": [
+      {
+        "horizon_sessions": 1,
+        "n_train": 465,
+        "n_validation": 242,
+        "additional_delay_sessions": [
+          0,
+          1,
+          2
+        ],
+        "mse_reduction_vs_count_control_pct": [
+          -0.816,
+          -0.464,
+          1.364
+        ]
+      },
+      {
+        "horizon_sessions": 5,
+        "n_train": 461,
+        "n_validation": 238,
+        "additional_delay_sessions": [
+          0,
+          1,
+          2
+        ],
+        "mse_reduction_vs_count_control_pct": [
+          -0.713,
+          -1.042,
+          -1.33
+        ]
+      },
+      {
+        "horizon_sessions": 20,
+        "n_train": 446,
+        "n_validation": 223,
+        "additional_delay_sessions": [
+          0,
+          1,
+          2
+        ],
+        "mse_reduction_vs_count_control_pct": [
+          0.467,
+          0.024,
+          0.203
+        ]
+      },
+      {
+        "horizon_sessions": 60,
+        "n_train": 406,
+        "n_validation": 183,
+        "additional_delay_sessions": [
+          0,
+          1,
+          2
+        ],
+        "mse_reduction_vs_count_control_pct": [
+          -0.734,
+          -0.626,
+          -0.259
+        ]
+      }
+    ],
+    "price_control_example": {
+      "horizon_sessions": 5,
+      "additional_delay_sessions": 0,
+      "mse_reduction_vs_price_only_pct": 1.753,
+      "mse_reduction_vs_count_control_pct": -0.713,
+      "coverage": "Only this price-only comparison is explicitly reported; no missing conditions inferred."
+    }
+  },
+  "stage24": {
+    "study_id": "run_20261004T235930Z",
+    "target": "CSI300-adjusted event price return",
+    "target_role": "provisional_robustness_branch",
+    "cohort": "core",
+    "stocks": [
+      "300476",
+      "300308",
+      "300502",
+      "002384",
+      "002156"
+    ],
+    "training_start": "2018-01-01",
+    "validation_start": "2026-01-01",
+    "cutoff_exclusive": "2026-10-04",
+    "last_market_session": "2026-09-30",
+    "label": "Entry open at i to close at i + H - 1; H includes the entry session.",
+    "rank_ic_definition": "Spearman correlation pooled across stock-event observations; average ranks for ties.",
+    "nonoverlap_rule": "First chronological event per stock; next entry strictly after its planned exit; keep fitted model and training thresholds unchanged.",
+    "model_display_note": "Market features maps to the registered financial_* family; nine industry, valuation and accounting columns are entirely missing in training.",
+    "uncertainty_note": "Separate stock/month cluster intervals are descriptive. 60D has 17 outcomes and no interval under the registered minimum of 20.",
+    "models": [
+      "historical_mean",
+      "financial_only",
+      "metadata",
+      "tfidf",
+      "financial_tfidf",
+      "financial_metadata",
+      "financial_metadata_tfidf"
+    ],
+    "results": [
+      {
+        "model": "historical_mean",
+        "display_label": "Historical mean",
+        "horizon_sessions": 5,
+        "n_train": 276,
+        "n_validation_predictions": 25,
+        "n_observed_outcomes": 25,
+        "n_nonoverlap_observed_outcomes": 22,
+        "n_nonoverlap_pretrade_events": 22,
+        "rank_ic": null,
+        "pearson_ic": null,
+        "nonoverlap_rank_ic": null,
+        "rank_ic_stock_cluster_ci95": null,
+        "rank_ic_month_cluster_ci95": null
+      },
+      {
+        "model": "financial_only",
+        "display_label": "Market features",
+        "horizon_sessions": 5,
+        "n_train": 276,
+        "n_validation_predictions": 25,
+        "n_observed_outcomes": 25,
+        "n_nonoverlap_observed_outcomes": 22,
+        "n_nonoverlap_pretrade_events": 22,
+        "rank_ic": -0.022324865280985373,
+        "pearson_ic": -0.052445858958452655,
+        "nonoverlap_rank_ic": -0.02089215132693394,
+        "rank_ic_stock_cluster_ci95": [
+          -0.3333333333333333,
+          0.3814961859114987
+        ],
+        "rank_ic_month_cluster_ci95": [
+          -0.3759920634920635,
+          0.6117285933172251
+        ]
+      },
+      {
+        "model": "metadata",
+        "display_label": "Event metadata",
+        "horizon_sessions": 5,
+        "n_train": 276,
+        "n_validation_predictions": 25,
+        "n_observed_outcomes": 25,
+        "n_nonoverlap_observed_outcomes": 22,
+        "n_nonoverlap_pretrade_events": 22,
+        "rank_ic": 0.2558676603402284,
+        "pearson_ic": 0.32216939507651293,
+        "nonoverlap_rank_ic": 0.27385657820440434,
+        "rank_ic_stock_cluster_ci95": [
+          0.09099968274890441,
+          0.46407471522950466
+        ],
+        "rank_ic_month_cluster_ci95": [
+          0.02935068210386426,
+          0.5534792539017888
+        ]
+      },
+      {
+        "model": "tfidf",
+        "display_label": "TF–IDF text",
+        "horizon_sessions": 5,
+        "n_train": 276,
+        "n_validation_predictions": 25,
+        "n_observed_outcomes": 25,
+        "n_nonoverlap_observed_outcomes": 22,
+        "n_nonoverlap_pretrade_events": 22,
+        "rank_ic": 0.3774528944267128,
+        "pearson_ic": 0.41997921194118565,
+        "nonoverlap_rank_ic": 0.29757199322416716,
+        "rank_ic_stock_cluster_ci95": [
+          -0.06896710984406469,
+          0.7220000000000001
+        ],
+        "rank_ic_month_cluster_ci95": [
+          -0.29357939297053265,
+          0.6727790008272881
+        ]
+      },
+      {
+        "model": "financial_tfidf",
+        "display_label": "Market + text",
+        "horizon_sessions": 5,
+        "n_train": 276,
+        "n_validation_predictions": 25,
+        "n_observed_outcomes": 25,
+        "n_nonoverlap_observed_outcomes": 22,
+        "n_nonoverlap_pretrade_events": 22,
+        "rank_ic": 0.01885340655138525,
+        "pearson_ic": -0.006666322293988876,
+        "nonoverlap_rank_ic": 0.009599096555618296,
+        "rank_ic_stock_cluster_ci95": [
+          -0.3326709713607489,
+          0.39307147530796427
+        ],
+        "rank_ic_month_cluster_ci95": [
+          -0.35675036717024267,
+          0.5769039287677868
+        ]
+      },
+      {
+        "model": "financial_metadata",
+        "display_label": "Market + metadata",
+        "horizon_sessions": 5,
+        "n_train": 276,
+        "n_validation_predictions": 25,
+        "n_observed_outcomes": 25,
+        "n_nonoverlap_observed_outcomes": 22,
+        "n_nonoverlap_pretrade_events": 22,
+        "rank_ic": -0.0284724915265818,
+        "pearson_ic": 0.02214263731308678,
+        "nonoverlap_rank_ic": -0.02089215132693394,
+        "rank_ic_stock_cluster_ci95": [
+          -0.37344678548867327,
+          0.35200620936533056
+        ],
+        "rank_ic_month_cluster_ci95": [
+          -0.4284578452101601,
+          0.5769141979640193
+        ]
+      },
+      {
+        "model": "financial_metadata_tfidf",
+        "display_label": "Market + metadata + text",
+        "horizon_sessions": 5,
+        "n_train": 276,
+        "n_validation_predictions": 25,
+        "n_observed_outcomes": 25,
+        "n_nonoverlap_observed_outcomes": 22,
+        "n_nonoverlap_pretrade_events": 22,
+        "rank_ic": 0.0003847633990078622,
+        "pearson_ic": 0.04242201614907495,
+        "nonoverlap_rank_ic": 0.011857707509881424,
+        "rank_ic_stock_cluster_ci95": [
+          -0.3704631893329715,
+          0.35200620936533056
+        ],
+        "rank_ic_month_cluster_ci95": [
+          -0.33440090562116576,
+          0.5333676401727534
+        ]
+      },
+      {
+        "model": "historical_mean",
+        "display_label": "Historical mean",
+        "horizon_sessions": 20,
+        "n_train": 276,
+        "n_validation_predictions": 25,
+        "n_observed_outcomes": 25,
+        "n_nonoverlap_observed_outcomes": 18,
+        "n_nonoverlap_pretrade_events": 18,
+        "rank_ic": null,
+        "pearson_ic": null,
+        "nonoverlap_rank_ic": null,
+        "rank_ic_stock_cluster_ci95": null,
+        "rank_ic_month_cluster_ci95": null
+      },
+      {
+        "model": "financial_only",
+        "display_label": "Market features",
+        "horizon_sessions": 20,
+        "n_train": 276,
+        "n_validation_predictions": 25,
+        "n_observed_outcomes": 25,
+        "n_nonoverlap_observed_outcomes": 18,
+        "n_nonoverlap_pretrade_events": 18,
+        "rank_ic": -0.12009237875288685,
+        "pearson_ic": -0.17158155889069907,
+        "nonoverlap_rank_ic": -0.08565531475748193,
+        "rank_ic_stock_cluster_ci95": [
+          -0.6248904469763366,
+          0.24823950796534305
+        ],
+        "rank_ic_month_cluster_ci95": [
+          -0.612265003096302,
+          0.6074279877425943
+        ]
+      },
+      {
+        "model": "metadata",
+        "display_label": "Event metadata",
+        "horizon_sessions": 20,
+        "n_train": 276,
+        "n_validation_predictions": 25,
+        "n_observed_outcomes": 25,
+        "n_nonoverlap_observed_outcomes": 18,
+        "n_nonoverlap_pretrade_events": 18,
+        "rank_ic": -0.564063142945526,
+        "pearson_ic": -0.3335431171549367,
+        "nonoverlap_rank_ic": -0.7750257997936018,
+        "rank_ic_stock_cluster_ci95": [
+          -0.8140584280681356,
+          -0.23986276955905844
+        ],
+        "rank_ic_month_cluster_ci95": [
+          -0.8281597884860052,
+          -0.015814955763683435
+        ]
+      },
+      {
+        "model": "tfidf",
+        "display_label": "TF–IDF text",
+        "horizon_sessions": 20,
+        "n_train": 276,
+        "n_validation_predictions": 25,
+        "n_observed_outcomes": 25,
+        "n_nonoverlap_observed_outcomes": 18,
+        "n_nonoverlap_pretrade_events": 18,
+        "rank_ic": -0.3451327689100524,
+        "pearson_ic": -0.2728090085766254,
+        "nonoverlap_rank_ic": -0.5933952528379773,
+        "rank_ic_stock_cluster_ci95": [
+          -0.6937897031738849,
+          0.05336433298026903
+        ],
+        "rank_ic_month_cluster_ci95": [
+          -0.8157858808749602,
+          0.4251560650308982
+        ]
+      },
+      {
+        "model": "financial_tfidf",
+        "display_label": "Market + text",
+        "horizon_sessions": 20,
+        "n_train": 276,
+        "n_validation_predictions": 25,
+        "n_observed_outcomes": 25,
+        "n_nonoverlap_observed_outcomes": 18,
+        "n_nonoverlap_pretrade_events": 18,
+        "rank_ic": -0.25702195053725196,
+        "pearson_ic": -0.22741746086088177,
+        "nonoverlap_rank_ic": -0.3519091847265222,
+        "rank_ic_stock_cluster_ci95": [
+          -0.7308687171575682,
+          0.1394680180249862
+        ],
+        "rank_ic_month_cluster_ci95": [
+          -0.5636997804701749,
+          0.37033298669417036
+        ]
+      },
+      {
+        "model": "financial_metadata",
+        "display_label": "Market + metadata",
+        "horizon_sessions": 20,
+        "n_train": 276,
+        "n_validation_predictions": 25,
+        "n_observed_outcomes": 25,
+        "n_nonoverlap_observed_outcomes": 18,
+        "n_nonoverlap_pretrade_events": 18,
+        "rank_ic": -0.2812620446747473,
+        "pearson_ic": -0.25476903706331006,
+        "nonoverlap_rank_ic": -0.3869969040247678,
+        "rank_ic_stock_cluster_ci95": [
+          -0.6754166070273299,
+          0.03686368835317957
+        ],
+        "rank_ic_month_cluster_ci95": [
+          -0.5839981344601779,
+          0.31387787104911535
+        ]
+      },
+      {
+        "model": "financial_metadata_tfidf",
+        "display_label": "Market + metadata + text",
+        "horizon_sessions": 20,
+        "n_train": 276,
+        "n_validation_predictions": 25,
+        "n_observed_outcomes": 25,
+        "n_nonoverlap_observed_outcomes": 18,
+        "n_nonoverlap_pretrade_events": 18,
+        "rank_ic": -0.25779147733526764,
+        "pearson_ic": -0.25363779289561694,
+        "nonoverlap_rank_ic": -0.38493292053663575,
+        "rank_ic_stock_cluster_ci95": [
+          -0.6808567627509906,
+          0.03686368835317957
+        ],
+        "rank_ic_month_cluster_ci95": [
+          -0.5497472402066224,
+          0.2806109179212464
+        ]
+      },
+      {
+        "model": "historical_mean",
+        "display_label": "Historical mean",
+        "horizon_sessions": 60,
+        "n_train": 271,
+        "n_validation_predictions": 25,
+        "n_observed_outcomes": 17,
+        "n_nonoverlap_observed_outcomes": 7,
+        "n_nonoverlap_pretrade_events": 12,
+        "rank_ic": null,
+        "pearson_ic": null,
+        "nonoverlap_rank_ic": null,
+        "rank_ic_stock_cluster_ci95": null,
+        "rank_ic_month_cluster_ci95": null
+      },
+      {
+        "model": "financial_only",
+        "display_label": "Market features",
+        "horizon_sessions": 60,
+        "n_train": 271,
+        "n_validation_predictions": 25,
+        "n_observed_outcomes": 17,
+        "n_nonoverlap_observed_outcomes": 7,
+        "n_nonoverlap_pretrade_events": 12,
+        "rank_ic": 0.28009828009828003,
+        "pearson_ic": 0.32111845156629343,
+        "nonoverlap_rank_ic": 0.03571428571428572,
+        "rank_ic_stock_cluster_ci95": null,
+        "rank_ic_month_cluster_ci95": null
+      },
+      {
+        "model": "metadata",
+        "display_label": "Event metadata",
+        "horizon_sessions": 60,
+        "n_train": 271,
+        "n_validation_predictions": 25,
+        "n_observed_outcomes": 17,
+        "n_nonoverlap_observed_outcomes": 7,
+        "n_nonoverlap_pretrade_events": 12,
+        "rank_ic": 0.22331305153610267,
+        "pearson_ic": 0.028625816684206037,
+        "nonoverlap_rank_ic": -0.10714285714285716,
+        "rank_ic_stock_cluster_ci95": null,
+        "rank_ic_month_cluster_ci95": null
+      },
+      {
+        "model": "tfidf",
+        "display_label": "TF–IDF text",
+        "horizon_sessions": 60,
+        "n_train": 271,
+        "n_validation_predictions": 25,
+        "n_observed_outcomes": 17,
+        "n_nonoverlap_observed_outcomes": 7,
+        "n_nonoverlap_pretrade_events": 12,
+        "rank_ic": -0.22576704111342247,
+        "pearson_ic": -0.14504695669012233,
+        "nonoverlap_rank_ic": -0.10714285714285716,
+        "rank_ic_stock_cluster_ci95": null,
+        "rank_ic_month_cluster_ci95": null
+      },
+      {
+        "model": "financial_tfidf",
+        "display_label": "Market + text",
+        "horizon_sessions": 60,
+        "n_train": 271,
+        "n_validation_predictions": 25,
+        "n_observed_outcomes": 17,
+        "n_nonoverlap_observed_outcomes": 7,
+        "n_nonoverlap_pretrade_events": 12,
+        "rank_ic": 0.2638038795618795,
+        "pearson_ic": 0.3074013612160441,
+        "nonoverlap_rank_ic": 0.03571428571428572,
+        "rank_ic_stock_cluster_ci95": null,
+        "rank_ic_month_cluster_ci95": null
+      },
+      {
+        "model": "financial_metadata",
+        "display_label": "Market + metadata",
+        "horizon_sessions": 60,
+        "n_train": 271,
+        "n_validation_predictions": 25,
+        "n_observed_outcomes": 17,
+        "n_nonoverlap_observed_outcomes": 7,
+        "n_nonoverlap_pretrade_events": 12,
+        "rank_ic": 0.2000001505515645,
+        "pearson_ic": 0.263316626287809,
+        "nonoverlap_rank_ic": -0.28571428571428575,
+        "rank_ic_stock_cluster_ci95": null,
+        "rank_ic_month_cluster_ci95": null
+      },
+      {
+        "model": "financial_metadata_tfidf",
+        "display_label": "Market + metadata + text",
+        "horizon_sessions": 60,
+        "n_train": 271,
+        "n_validation_predictions": 25,
+        "n_observed_outcomes": 17,
+        "n_nonoverlap_observed_outcomes": 7,
+        "n_nonoverlap_pretrade_events": 12,
+        "rank_ic": 0.24539895773198095,
+        "pearson_ic": 0.2688758361207508,
+        "nonoverlap_rank_ic": -0.1785714285714286,
+        "rank_ic_stock_cluster_ci95": null,
+        "rank_ic_month_cluster_ci95": null
+      }
+    ],
+    "status": {
+      "formal_industry_stock_count": 0,
+      "paid_llm_requests": 0,
+      "semantic_and_surprise_models": "not_run",
+      "alpha_status": "not_established"
+    }
+  },
+  "verification": {
+    "saved_point_metric_status": "passed",
+    "saved_point_metric_count": 2289,
+    "saved_ledger_status": "passed",
+    "saved_ledger_accounts": 63,
+    "saved_offline_test_status": "passed",
+    "saved_offline_test_count": 373,
+    "scope": "Saved engineering verification counts; no new research or tests run by this renderer."
+  }
+}

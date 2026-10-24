@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="400" viewBox="0 0 1200 400" role="img" aria-labelledby="hero-title hero-desc">
+  <title id="hero-title">Language. Expectations. Markets.</title>
+  <desc id="hero-desc">Time-aware NLP for Chinese financial disclosures. An abstract, non-data illustration connects source text, representations and an event on a timeline.</desc>
+  <defs>
+    <pattern id="paper-grid" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="0.8" fill="#172b3a" opacity="0.06"/>
+    </pattern>
+    <marker id="flow-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M1 1 7 4 1 7" fill="none" stroke="#087f8c" stroke-width="1.3" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="400" rx="16" fill="#f7f6f0"/>
+  <rect x="602" y="32" width="566" height="336" fill="url(#paper-grid)"/>
+  <path d="M40 40H1160" stroke="#172b3a" stroke-width="1" opacity="0.18"/>
+  <rect x="40" y="40" width="56" height="4" fill="#087f8c"/>
+  <text x="40" y="78" fill="#087f8c" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" letter-spacing="2.5">A-SHARE · LANGUAGE &amp; MARKET RESEARCH</text>
+  <g fill="#172b3a" font-family="Georgia, 'Times New Roman', serif" font-size="63" letter-spacing="-1.7">
+    <text x="36" y="150">Language.</text>
+    <text x="36" y="216">Expectations.</text>
+    <text x="36" y="282">Markets.</text>
+  </g>
+  <text x="40" y="328" fill="#172b3a" font-family="Arial, Helvetica, sans-serif" font-size="22">Time-aware NLP for Chinese financial disclosures</text>
+  <text x="40" y="367" fill="#61717a" font-family="Arial, Helvetica, sans-serif" font-size="15" letter-spacing="1.7">SOURCE → REPRESENTATION → EVIDENCE</text>
+
+  <!-- Abstract editorial geometry. No observations or performance series. -->
+  <g stroke="#d7ddd8" fill="none">
+    <path d="M644 102V300M819 102V300M993 102V300"/>
+  </g>
+  <g fill="#f7f6f0" stroke="#172b3a" stroke-width="1.4">
+    <rect x="636" y="126" width="116" height="141" rx="7" opacity="0.16"/>
+    <rect x="628" y="118" width="116" height="141" rx="7" opacity="0.35"/>
+    <rect x="620" y="110" width="116" height="141" rx="7"/>
+  </g>
+  <g fill="#172b3a">
+    <rect x="636" y="130" width="66" height="4" rx="2"/>
+    <rect x="636" y="142" width="82" height="3" rx="1.5" opacity="0.24"/>
+    <rect x="636" y="154" width="52" height="3" rx="1.5" opacity="0.24"/>
+    <rect x="636" y="206" width="68" height="3" rx="1.5" opacity="0.24"/>
+    <rect x="636" y="218" width="79" height="3" rx="1.5" opacity="0.24"/>
+    <rect x="636" y="230" width="44" height="3" rx="1.5" opacity="0.24"/>
+  </g>
+  <rect x="632" y="170" width="56" height="23" rx="4" fill="#dceceb"/>
+  <rect x="694" y="170" width="28" height="23" rx="4" fill="#ebd9cb"/>
+  <g stroke="#087f8c" stroke-width="1.5" fill="none" marker-end="url(#flow-arrow)">
+    <path d="M762 185H804"/>
+    <path d="M936 185H976"/>
+  </g>
+
+  <g stroke="#087f8c" stroke-width="1.25" opacity="0.25">
+    <path d="M833 142 879 142 925 142M833 185 879 185 925 185M833 228 879 228 925 228"/>
+    <path d="M833 142 833 228M879 142V228M925 142V228M833 142 925 228M833 228 925 142"/>
+  </g>
+  <g fill="#f7f6f0" stroke="#087f8c" stroke-width="1.7">
+    <circle cx="833" cy="142" r="8"/><circle cx="879" cy="142" r="8"/><circle cx="925" cy="142" r="8"/>
+    <circle cx="833" cy="185" r="8"/><circle cx="925" cy="185" r="8"/>
+    <circle cx="833" cy="228" r="8"/><circle cx="879" cy="228" r="8"/><circle cx="925" cy="228" r="8"/>
+  </g>
+  <circle cx="879" cy="185" r="11" fill="#087f8c"/>
+  <circle cx="925" cy="142" r="4" fill="#bf6a3b" stroke="#f7f6f0" stroke-width="1.5"/>
+
+  <g fill="none" stroke="#087f8c">
+    <ellipse cx="1062" cy="185" rx="64" ry="64" stroke-width="1.3" opacity="0.18"/>
+    <ellipse cx="1062" cy="185" rx="45" ry="45" stroke-width="1.3" opacity="0.35"/>
+    <path d="M1000 219 1062 131 1124 219Z" stroke-width="1.6" opacity="0.55"/>
+    <path d="M996 185H1148" stroke-width="1.6"/>
+    <path d="M1062 107V263" stroke-width="1.2" stroke-dasharray="3 6" opacity="0.5"/>
+  </g>
+  <circle cx="1062" cy="185" r="8" fill="#bf6a3b"/>
+  <circle cx="1000" cy="185" r="3.5" fill="#087f8c"/>
+  <circle cx="1124" cy="185" r="3.5" fill="#087f8c"/>
+  <g fill="#172b3a" font-family="Arial, Helvetica, sans-serif" font-size="16" text-anchor="middle" letter-spacing="1.1">
+    <text x="681" y="294">TEXT</text>
+    <text x="879" y="294">REPRESENTATION</text>
+    <text x="1062" y="294">EVENT</text>
+  </g>
+  <path d="M620 321H1145" stroke="#172b3a" opacity="0.15"/>
+  <text x="620" y="347" fill="#61717a" font-family="Arial, Helvetica, sans-serif" font-size="16">What was known, and when it became tradable.</text>
+</svg>
