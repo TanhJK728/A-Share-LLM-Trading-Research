@@ -85,12 +85,12 @@ This formulation gives the text and return a common timeline. It also fixes the 
 
 We measure ranking quality with Spearman correlation across stock-events that have observed returns:
 
-```math
+$$
 \mathrm{RankIC}_H=
-\operatorname{Corr}_{e\in\mathcal V_H}
-\left(\operatorname{rank}(\hat y_{e,H}),
-\operatorname{rank}(y_{e,H})\right).
-```
+\mathrm{Corr}_{e\in\mathcal V_H}
+\left(\mathrm{rank}(\hat y_{e,H}),
+\mathrm{rank}(y_{e,H})\right).
+$$
 
 The comparison keeps the fitted model fixed and removes overlapping holding windows within each stock. We report both estimates with their sample counts. This makes the sensitivity to event overlap visible at each horizon.
 
